@@ -84,7 +84,39 @@ export async function POST(req: NextRequest, res: NextResponse) {
     // Else we return the info returned from openai
     if (function_call) {
       const args = JSON.parse(function_call.arguments);
+      // Case I : For audio/music generation
+      if (function_call.name === 'createMusic') {
+        const music_output = await replicate.run(
+          'facebookresearch/musicgen:7a76a8258b23fae65c5a22debb8841d1d7e816b75c2f24218cd2bd8573787906',
+          {
+            input: {
+              model_version: 'melody',
+              ...args,
+            },
+          },
+        );
+        return NextResponse.json({
+          data: music_output,
+          type: 'audio',
+        });
+      }
+      // Case II : For image
+      if (function_call.name === 'createImage') {
+        const image_output = await replicate.run(
+          'ai-forever/kandinsky-2:601eea49d49003e6ea75a11527209c4f510a93e2112c969d548fbb45b9c4f19f',
+          {
+            input: {
+              ...args,
+            },
+          },
+        );
+        return NextResponse.json({
+          data: image_output,
+          type: 'image',
+        });
+      }
     } else {
+      // Case III : For text
       return NextResponse.json({ data: choice.message.content, type: 'text' });
     }
   } catch (e) {
