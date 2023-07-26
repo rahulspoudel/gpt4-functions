@@ -30,15 +30,19 @@ export default function Home() {
       const { data, type } = await response.json();
       if (type === 'image') {
         setImage(data[0]);
+        setLoading(false);
       }
       if (type === 'audio') {
-        setImage(data);
+        setAudio(data);
+        setLoading(false);
       }
       if (type === 'text') {
-        setImage(data);
+        setText(data);
+        setLoading(false);
       }
     } catch (e) {
       console.log('error: ', e);
+      setLoading(false);
     }
   }
 
